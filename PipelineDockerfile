@@ -28,20 +28,6 @@ RUN apt-get update -yqq && \
     apt-get install -yqq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose && \
     echo "Docker installed successfully"
 
-# Install Maven to build Java projects
-ENV MAVEN_VERSION=3.8.4
-ENV MAVEN_HOME=/usr/share/maven
-ENV PATH=${MAVEN_HOME}/bin:${PATH}
-
-RUN apt-get update -yqq && \
-    apt-get install -yqq wget && \
-    wget -q https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz -O /tmp/apache-maven.tar.gz && \
-    mkdir -p ${MAVEN_HOME} && \
-    tar -zxvf /tmp/apache-maven.tar.gz --strip-components=1 -C ${MAVEN_HOME} && \
-    rm /tmp/apache-maven.tar.gz && \
-    mvn --version && \
-    echo "Maven installed successfully"
-
 # Install Nexus Repository Manager
 ENV NEXUS_VERSION=3.36.0-02
 ENV NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz
