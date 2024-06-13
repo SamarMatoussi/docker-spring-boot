@@ -18,7 +18,7 @@ pipelineJob('pipeline') {
     stages {
         stage('Clean workspace') {
     steps {
-        sh 'git clean -xffd\'
+        sh 'git clean -xffd'
     }
 }
 
@@ -28,7 +28,7 @@ pipelineJob('pipeline') {
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
             }
         }
-        stage('maven') {
+        stage('Build and Run Cassandra') {
     agent { docker 'maven:3.8.3-openjdk-8' }
     steps {
         script {
