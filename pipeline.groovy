@@ -19,19 +19,14 @@ pipelineJob('pipeline') {
             steps {
                 echo 'Cloning the repository'
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
-                sh 'docker run hello-world'
             }
         }
         stage('MVN CLEAN'){
             steps {
-            bat 'mvn clean'
+            sh 'mvn clean'
             }
         }
-        stage('unit_test') {
-            steps {
-                sh 'echo "Start the unit test"'
-            }
-        }
+       
         stage('Build Image') {
             steps {
                 script {
@@ -48,16 +43,7 @@ pipelineJob('pipeline') {
                 }
             }
         }
-     stage('Deploy to Production') {
-            steps {
-                script {
-                    docker.withRegistry('', registryCredential) {
-                        dockerImage.pull()
-                        docker.image("${registry}:$BUILD_NUMBER").run()
-                    }
-                }
-            }
-        }    
+         
     }
 }''')
     }
