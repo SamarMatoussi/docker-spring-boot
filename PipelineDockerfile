@@ -1,34 +1,45 @@
-# Start from the latest Ubuntu image
+# Use the latest Ubuntu LTS as the base image
 FROM ubuntu:latest
 
-# Switch to root user to perform installations
+# Set the Dockerfile author
+LABEL maintainer="Your Name <your.email@example.com>"
+
+# Switch to root user to perform installation
 USER root
 
-# Update package lists and install necessary packages: Git, JDK, Docker, wget
+# Install Git to clone repositories
 RUN apt-get update -yqq && \
-    apt-get install -yqq git openjdk-8-jdk wget \
-        ca-certificates curl gnupg \
-        apt-transport-https \
-        software-properties-common && \
-    echo "Git, JDK, and basic tools installed successfully"
+    apt-get install -yqq git && \
+    echo "Git installed successfully"
 
-# Install Docker CE
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+# Install Docker to manage containers
+RUN apt-get update -yqq && \
+    apt-get install -yqq \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg-agent \
+        software-properties-common && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
     echo \
-    "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update -yqq && \
     apt-get install -yqq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose && \
     echo "Docker installed successfully"
 
-# Install Maven
+# Install Maven to build Java projects
 ENV MAVEN_VERSION=3.8.4
-ENV MAVEN_HOME=/opt/maven
-ENV MAVEN_DOWNLOAD_URL=https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
+ENV MAVEN_HOME=/usr/share/maven
+ENV PATH=${MAVEN_HOME}/bin:${PATH}
 
-RUN mkdir -p ${MAVEN_HOME} && \
-    curl -fsSL ${MAVEN_DOWNLOAD_URL} | tar -xzC ${MAVEN_HOME} --strip-components=1 && \
-    update-alternatives --install /usr/bin/mvn mvn ${MAVEN_HOME}/bin/mvn 1001 && \
+RUN apt-get update -yqq && \
+    apt-get install -yqq wget && \
+    wget -q https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz -O /tmp/apache-maven.tar.gz && \
+    mkdir -p ${MAVEN_HOME} && \
+    tar -zxvf /tmp/apache-maven.tar.gz --strip-components=1 -C ${MAVEN_HOME} && \
+    rm /tmp/apache-maven.tar.gz && \
+    mvn --version && \
     echo "Maven installed successfully"
 
 # Install Nexus Repository Manager
@@ -37,11 +48,13 @@ ENV NEXUS_DOWNLOAD_URL=https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSI
 ENV NEXUS_HOME=/opt/nexus
 ENV NEXUS_DATA=/nexus-data
 
-RUN wget -q ${NEXUS_DOWNLOAD_URL} -O /tmp/nexus.tar.gz && \
+RUN apt-get update -yqq && \
+    apt-get install -yqq wget && \
+    wget -q ${NEXUS_DOWNLOAD_URL} -O /tmp/nexus.tar.gz && \
     mkdir -p ${NEXUS_HOME} && \
     tar -zxvf /tmp/nexus.tar.gz --strip-components=1 -C ${NEXUS_HOME} && \
     rm /tmp/nexus.tar.gz && \
-    adduser --disabled-login --gecos '' nexus && \
+    adduser --disabled-login --system --home ${NEXUS_HOME} nexus && \
     mkdir -p ${NEXUS_DATA} && \
     chown -R nexus:nexus ${NEXUS_HOME} ${NEXUS_DATA} && \
     echo "Nexus installed successfully"
@@ -49,8 +62,8 @@ RUN wget -q ${NEXUS_DOWNLOAD_URL} -O /tmp/nexus.tar.gz && \
 # Expose Nexus port
 EXPOSE 8081
 
-# Set Nexus to run as the nexus user
+# Switch to the nexus user to run Nexus
 USER nexus
 
 # Start Nexus
-CMD ${NEXUS_HOME}/bin/nexus run
+CMD ["sh", "-c", "${NEXUS_HOME}/bin/nexus run"]
