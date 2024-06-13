@@ -29,15 +29,18 @@ pipelineJob('pipeline') {
             }
         }
         stage('Build and Run Cassandra') {
-    agent { docker 'maven:3.8.3-openjdk-8' }
+    agent {
+        docker 'maven:3.8.3-openjdk-8'
+    }
     steps {
         script {
             dir('docker-spring-boot') {
-                sh 'mvn clean install -DskipTests'                
+                sh 'mvn clean install -DskipTests'
             }
         }
     }
 }
+
         stage('Build Image') {
             steps {
                 script {
