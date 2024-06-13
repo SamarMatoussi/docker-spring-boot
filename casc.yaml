@@ -1,0 +1,230 @@
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              description: "Sample credentials of exampleuser"
+              id: "github-credentials"
+              password: "{AQAAABAAAAAwN3oKH84wlLIZiVkLpH4xQ+F6qNV68TVypWzTCj2+A6wsSKAZ87Df7KnHZZa16nwit3ixFTDq0LyeNlxI6wEjxw==}"
+              scope: GLOBAL
+              username: "SamarMatoussi"
+          - usernamePassword:
+              id: "dockerHub"
+              password: "{AQAAABAAAAAQEQGj3HN1yOG2VaCiwIBUuhKMzNl5p0XfPdO8XMNMeJY=}"
+              scope: GLOBAL
+              username: "samarmatoussi"
+jenkins:
+  agentProtocols:
+    - "JNLP4-connect"
+    - "Ping"
+  authorizationStrategy:
+    globalMatrix:
+      entries:
+        - userOrGroup:
+            name: "admin"
+            permissions:
+              - "Overall/Administer"
+        - userOrGroup:
+            name: "authenticated"
+            permissions:
+              - "Overall/Read"
+  clouds:
+    - docker:
+        containerCap: 5
+        dockerApi:
+          connectTimeout: 60
+          dockerHost:
+            uri: "unix://var/run/docker.sock"
+          readTimeout: 60
+        exposeDockerHost: true
+        name: "dind"
+        templates:
+          - connector: "attach"
+            dockerTemplateBase:
+              cpuPeriod: 0
+              cpuQuota: 0
+              image: "pipeline/agent"
+            instanceCapStr: "10"
+            labelString: "agent"
+            mode: EXCLUSIVE
+            name: "Jenkins Agent"
+            pullStrategy: PULL_ALWAYS
+            pullTimeout: 300
+            remoteFs: "/home/jenkins/agent"
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  disableRememberMe: false
+  disabledAdministrativeMonitors:
+    - "org.jenkinsci.plugins.matrixauth.AmbiguityMonitor"
+    - "jenkins.diagnostics.ControllerExecutorsAgents"
+    - "hudson.diagnosis.ReverseProxySetupMonitor"
+  labelAtoms:
+    - name: "agent"
+    - name: "built-in"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  nodeMonitors:
+    - "architecture"
+    - "clock"
+    - diskSpace:
+        freeSpaceThreshold: "1GiB"
+        freeSpaceWarningThreshold: "2GiB"
+    - "swapSpace"
+    - tmpSpace:
+        freeSpaceThreshold: "1GiB"
+        freeSpaceWarningThreshold: "2GiB"
+    - "responseTime"
+  numExecutors: 2
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  quietPeriod: 5
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+        - id: "admin"
+          name: "admin"
+          properties:
+            - "apiToken"
+            - "consoleUrlProvider"
+            - "mailer"
+            - "myView"
+            - preferredProvider:
+                providerId: "default"
+            - "timezone"
+            - "experimentalFlags"
+            - "favorite"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+      - id: "default"
+        url: "https://updates.jenkins.io/update-center.json"
+  views:
+    - all:
+        name: "all"
+  viewsTabBar: "standard"
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: "none"
+    typeFilter: "none"
+appearance:
+  prism:
+    theme: PRISM
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "knownHostsFileVerificationStrategy"
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: true
+  queueItemAuthenticator:
+    authenticators:
+      - global:
+          strategy: "triggeringUsersAuthorizationStrategy"
+  sSHD:
+    port: -1
+  scriptApproval:
+    approvedScriptHashes:
+      - "SHA512:1ca02ff87238cf1fb95779ea7764bd9e71c030be51590dde028d43a86fcdb7016e9e8be3f71d9dba348631c44fcd8e9dbb2f76244727bd99e1e4c59f277b24a8"
+      - "SHA512:40b93b42ec13dc206062cd1bde27789a8d8ad6a8b190752e3d6eea4dbcc7ddbf6e6636e97db6b8b1ca7c07bcdfae84d3031bcc5fe6ac787732689eda6a8dc34b"
+      - "SHA512:a8f34ce6b1f69910c35501f96b2f466fe2c780bb4b533694f18af6e88e4fbce69abaa3bcd52ec5a01288c03e6e4aaabbafc440f2ea6a4238a28bb6b2e2024c4b"
+unclassified:
+  bitbucketEndpointConfiguration:
+    endpoints:
+      - bitbucketCloudEndpoint:
+          enableCache: false
+          manageHooks: false
+          repositoriesCacheDuration: 0
+          teamCacheDuration: 0
+  buildDiscarders:
+    configuredBuildDiscarders:
+      - "jobBuildDiscarder"
+  buildStepOperation:
+    enabled: false
+  email-ext:
+    adminRequiredForTemplateTesting: false
+    allowUnregisteredEnabled: false
+    charset: "UTF-8"
+    debugMode: false
+    defaultBody: |-
+      $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+
+      Check console output at $BUILD_URL to view the results.
+    defaultSubject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!"
+    defaultTriggerIds:
+      - "hudson.plugins.emailext.plugins.trigger.FailureTrigger"
+    maxAttachmentSize: -1
+    maxAttachmentSizeMb: -1
+    precedenceBulk: false
+    watchingEnabled: false
+  enrichedSummaryConfig:
+    enrichedSummaryEnabled: false
+    httpClientDelayBetweenRetriesInSeconds: 1
+    httpClientMaxRetries: 3
+    httpClientTimeoutInSeconds: 1
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: "file"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: "http://server_ip:8080/github-webhook/"
+  globalTimeOutConfiguration:
+    operations:
+      - "abortOperation"
+    overwriteable: false
+  injectionConfig:
+    allowUntrusted: false
+    checkForBuildAgentErrors: false
+    enabled: false
+    enforceUrl: false
+    injectCcudExtension: false
+    injectMavenExtension: false
+  junitTestResultStorage:
+    storage: "file"
+  location:
+    adminAddress: "l'adresse n'est pas encore configurée <nobody@nowhere>"
+    url: "http://server_ip:8080/"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  mavenModuleSet:
+    localRepository: "default"
+  pollSCM:
+    pollingThreadCount: 10
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  timestamper:
+    allPipelines: false
+    elapsedTimeFormat: "'<b>'HH:mm:ss.S'</b> '"
+    systemTimeFormat: "'<b>'HH:mm:ss'</b> '"
+  whitelist:
+    enabled: false
+tool:
+  git:
+    installations:
+      - home: "git"
+        name: "Default"
+  mavenGlobalConfig:
+    globalSettingsProvider: "standard"
+    settingsProvider: "standard"
