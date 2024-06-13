@@ -23,7 +23,7 @@ pipelineJob('pipeline') {
         }
         stage('MVN CLEAN'){
             steps {
-            sh 'mvn clean'
+                sh 'export PATH=$PATH:/opt/maven/bin && mvn clean install'
             }
         }
        
