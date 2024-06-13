@@ -14,21 +14,30 @@ pipelineJob('pipeline') {
         registryCredential = 'dockerHub'
         dockerImage = ""
     }
-    tools {
-        maven 'maven'
-    }
+    
     stages {
+        stage('Clean workspace') {
+    steps {
+        sh 'git clean -xffd\'
+    }
+}
+
         stage('git') {
             steps {
                 echo 'Cloning the repository'
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
             }
         }
-        stage('MVN CLEAN') {
-            steps {
-                sh 'mvn clean install'
+        stage('maven') {
+    agent { docker 'maven:3.8.3-openjdk-8' }
+    steps {
+        script {
+            dir('docker-spring-boot') {
+                sh 'mvn clean install -DskipTests'                
             }
         }
+    }
+}
         stage('Build Image') {
             steps {
                 script {
