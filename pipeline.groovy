@@ -18,7 +18,7 @@ pipelineJob('pipeline') {
         stage('git') {
             steps {
                 echo 'Cloning the repository'
-                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/JCasC.git'
+                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
                 sh 'docker run hello-world'
             }
         }
