@@ -5,7 +5,7 @@ pipelineJob('pipeline') {
 '''pipeline {
     agent {
         docker {
-            image 'pipeline/jenkins'
+            image 'maven:3.8.3-openjdk-8'
             args '-u 0:0 -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -14,41 +14,33 @@ pipelineJob('pipeline') {
         registryCredential = 'dockerHub'
         dockerImage = ""
     }
-    
     stages {
         stage('Clean workspace') {
-    steps {
-        sh 'git clean -xffd'
-    }
-}
-
-        stage('git') {
+            steps {
+                sh 'git clean -xffd'
+            }
+        }
+        stage('Clone repository') {
             steps {
                 echo 'Cloning the repository'
-                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
+                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git\'
             }
         }
-        stage('Build and Run Cassandra') {
-    agent {
-        docker 'maven:3.8.3-openjdk-8'
-    }
-    steps {
-        script {
-            dir('docker-spring-boot') {
-                sh 'mvn clean install -DskipTests'
+        stage('Maven Build') {
+            steps {
+                dir('docker-spring-boot') {
+                    sh 'mvn clean install -DskipTests'
+                }
             }
         }
-    }
-}
-
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     dockerImage = docker.build("${registry}:$BUILD_NUMBER")
                 }
             }
         }
-        stage('Deploy Image') {
+        stage('Deploy Docker Image') {
             steps {
                 script {
                     docker.withRegistry('', registryCredential) {
@@ -56,6 +48,14 @@ pipelineJob('pipeline') {
                     }
                 }
             }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
