@@ -4,9 +4,6 @@ pipelineJob('pipeline') {
       script(
 '''pipeline {
     agent {
-    tools {
-        maven 'maven'
-    }
         docker {
             image 'pipeline/jenkins'
             args '-u 0:0 -v /var/run/docker.sock:/var/run/docker.sock'
@@ -16,7 +13,10 @@ pipelineJob('pipeline') {
         registry = "samarmatoussi/jcasc"
         registryCredential = 'dockerHub'
         dockerImage = ""
-    }                    
+    }
+    tools {
+        maven 'maven'
+    }
     stages {
         stage('git') {
             steps {
@@ -24,12 +24,11 @@ pipelineJob('pipeline') {
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
             }
         }
-        stage('MVN CLEAN'){
+        stage('MVN CLEAN') {
             steps {
-            sh 'mvn clean'
+                sh 'mvn clean install'
             }
         }
-       
         stage('Build Image') {
             steps {
                 script {
@@ -46,9 +45,9 @@ pipelineJob('pipeline') {
                 }
             }
         }
-        
     }
-}''')
+}
+''')
     }
   }
 }
