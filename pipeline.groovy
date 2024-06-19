@@ -1,8 +1,8 @@
 pipelineJob('pipeline') {
     definition {
         cps {
-            script(
-                    '''pipeline {
+            script("""
+pipeline {
     agent {
         docker {
             image 'maven:3.6.3-openjdk-8'
@@ -26,11 +26,19 @@ pipelineJob('pipeline') {
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
             }
         }
-        
         stage('Maven Build') {
             steps {
-                    sh 'mvn clean install -DskipTests'
-                
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+        stage('Artifact Construction') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('Publish to Nexus') {
+            steps {
+                sh 'mvn deploy'
             }
         }
         stage('Build Docker Image') {
@@ -59,7 +67,7 @@ pipelineJob('pipeline') {
         }
     }
 }
-''')
+""")
         }
     }
 }
