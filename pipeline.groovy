@@ -26,17 +26,11 @@ pipelineJob('pipeline') {
                 git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
             }
         }
-        stage('List files for debugging') {
-            steps {
-                sh 'ls -la'
-                sh 'ls -la docker-spring-boot'
-            }
-        }
+        
         stage('Maven Build') {
             steps {
-                dir('docker-spring-boot') {
                     sh 'mvn clean install -DskipTests'
-                }
+                
             }
         }
         stage('Build Docker Image') {
