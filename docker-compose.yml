@@ -26,6 +26,10 @@ services:
     restart: unless-stopped
     volumes:
       - nexus-data:/nexus-data
+  maven:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
 
 volumes:
   jenkins-data:
