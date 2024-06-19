@@ -10,6 +10,7 @@ pipeline {
         }
     }
     environment {
+        nexusUrl = 'http://192.168.0.110:8081/'
         registry = "samarmatoussi/jcasc"
         registryCredential = 'dockerHub'
         dockerImage = ""
