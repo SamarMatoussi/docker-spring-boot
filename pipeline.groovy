@@ -1,11 +1,11 @@
 pipelineJob('pipeline') {
-  definition {
-    cps {
-      script(
-'''pipeline {
+    definition {
+        cps {
+            script(
+                    '''pipeline {
     agent {
         docker {
-            image 'maven:3.8.3-openjdk-8'
+            image 'maven:3.6.3-openjdk-8'
             args '-u 0:0 -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -23,7 +23,13 @@ pipelineJob('pipeline') {
         stage('Clone repository') {
             steps {
                 echo 'Cloning the repository'
-                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git\'
+                git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/SamarMatoussi/docker-spring-boot.git'
+            }
+        }
+        stage('List files for debugging') {
+            steps {
+                sh 'ls -la'
+                sh 'ls -la docker-spring-boot'
             }
         }
         stage('Maven Build') {
@@ -60,6 +66,6 @@ pipelineJob('pipeline') {
     }
 }
 ''')
+        }
     }
-  }
 }
