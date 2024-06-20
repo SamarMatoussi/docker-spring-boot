@@ -10,7 +10,6 @@ pipeline {
         }
     }
     environment {
-        nexusUrl = 'http://192.168.0.110:8081/'
         registry = "samarmatoussi/jcasc"
         registryCredential = 'dockerHub'
         dockerImage = ""
@@ -37,6 +36,11 @@ pipeline {
                 sh 'mvn package'
             }
         }
+       stage('Deploy to Nexus') {
+    steps {
+        sh 'mvn deploy -DskipTests -Dmaven.repo.local=$HOME/.m2/repository'
+           }
+       }
         stage('Build Docker Image') {
             steps {
                 script {
